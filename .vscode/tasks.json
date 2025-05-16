@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "build"],
+      "group": "build",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Start MCP Server",
+      "type": "shell",
+      "command": "npm",
+      "args": ["start"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "isBackground": true,
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Dev Mode",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev"],
+      "isBackground": true,
+      "problemMatcher": ["$tsc-watch"]
+    }
+  ]
+}
