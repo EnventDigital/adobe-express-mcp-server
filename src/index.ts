@@ -409,6 +409,29 @@ server.tool(
     const usedLanguage = language || 'javascript';
     const usedFramework = framework || (feature.includes('dialog') ? 'react' : 'vanilla');
     
+    let codeSnippet = '';
+    let sourceNote = '';
+    
+    // Try to get sample from GitHub if in GitHub mode and token is available
+    if (currentKnowledgeMode === 'github' && process.env.MCP_GITHUB_PAT) {
+      try {
+        const githubSample = await githubService.getCodeSample(feature, usedLanguage, usedFramework);
+        if (githubSample) {
+          codeSnippet = githubSample.code;
+          sourceNote = `\n\n> Source: [Adobe Express Add-on Samples](${githubSample.html_url})`;
+        }
+      } catch (error) {
+        console.error(`Error fetching GitHub code sample for ${feature}:`, error);
+        // Will fall back to static examples
+      }
+    }
+    
+    // If we didn't get a sample from GitHub, use the static example
+    if (!codeSnippet) {
+      codeSnippet = getCodeExample(feature, usedLanguage, usedFramework);
+      sourceNote = '\n\n> Source: Built-in code examples';
+    }
+    
     return {
       content: [
         {
@@ -418,9 +441,10 @@ server.tool(
                 `${usedFramework !== 'none' ? ` using ${usedFramework}` : ''}` +
                 `:\n\n` +
                 '```' + usedLanguage + '\n' +
-                getCodeExample(feature, usedLanguage, usedFramework) +
-                '\n```\n\n' +
-                `## Usage Explanation\n\n${getFeatureExplanation(feature)}`,
+                codeSnippet +
+                '\n```' +
+                sourceNote +
+                `\n\n## Usage Explanation\n\n${getFeatureExplanation(feature)}`,
         },
       ],
     };
@@ -435,6 +459,20 @@ server.tool(
     const usedLanguage = language || 'javascript';
     const usedFramework = framework || (feature.includes('dialog') ? 'react' : 'vanilla');
     
+    let exampleNote = '';
+    
+    // Try to get a sample from GitHub if in GitHub mode and token is available
+    if (currentKnowledgeMode === 'github' && process.env.MCP_GITHUB_PAT) {
+      try {
+        const githubSample = await githubService.getCodeSample(feature, usedLanguage, usedFramework);
+        if (githubSample) {
+          exampleNote = `\n\n## Reference Implementation\n\nYou can find a reference implementation in the [Adobe Express Add-on Samples repository](${githubSample.html_url}).\n`;
+        }
+      } catch (error) {
+        console.error(`Error fetching GitHub sample reference for ${feature}:`, error);
+      }
+    }
+    
     return {
       content: [
         {
@@ -443,7 +481,8 @@ server.tool(
                 `I'll help you implement ${formatFeatureName(feature)} in your Adobe Express add-on project.\n\n` +
                 `## Implementation Steps\n\n${getImplementationSteps(feature, usedLanguage, usedFramework)}\n\n` +
                 `## Required Dependencies\n\n${getRequiredDependencies(feature)}\n\n` +
-                `## Key Components\n\n${getFeatureComponents(feature, usedLanguage, usedFramework)}`
+                `## Key Components\n\n${getFeatureComponents(feature, usedLanguage, usedFramework)}` +
+                exampleNote
         },
       ],
     };

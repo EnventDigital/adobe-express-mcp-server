@@ -44,6 +44,14 @@ const EXPRESS_DOCS_REPO_BASE_PATH = 'src/pages';
 const SWC_REPO_OWNER = 'adobe';
 const SWC_REPO_NAME = 'spectrum-web-components';
 const SWC_DOCS_PACKAGES_PATH = 'packages';
+const SAMPLES_REPO_OWNER = 'adobe-ccwebext';
+const SAMPLES_REPO_NAME = 'adobe-express-add-on-samples';
+const SAMPLES_BASE_PATH = 'samples';
+
+// Adobe Express add-on samples configuration
+const EXPRESS_SAMPLES_REPO_OWNER = 'AdobeDocs';
+const EXPRESS_SAMPLES_REPO_NAME = 'express-add-ons-samples';
+const EXPRESS_SAMPLES_BASE_PATH = 'samples';
 
 // Create Octokit instance for GitHub API interaction
 const octokit = new Octokit({
@@ -62,7 +70,7 @@ export interface MCPResultItem {
   language?: string;
   frontmatter?: Record<string, any>;
   parent_title?: string;
-  dataSource: 'express_sdk' | 'spectrum_web_components' | 'unknown';
+  dataSource: 'express_sdk' | 'spectrum_web_components' | 'code_sample' | 'unknown';
 }
 
 export interface GitHubFileSearchResult {
@@ -84,6 +92,15 @@ export interface GitHubFileContent {
   frontmatter: Record<string, any>;
   markdown_body: string;
   dataSource: 'express_sdk' | 'spectrum_web_components';
+}
+
+export interface CodeSampleResult {
+  code: string;
+  language: string;
+  filePath: string;
+  html_url: string;
+  feature: string;
+  framework?: string;
 }
 
 // --- Helper Functions ---
@@ -143,6 +160,38 @@ function extractTagsFromPath(filePathWithinBase: string, dataSource: 'express_sd
 }
 
 export class GitHubDocService {
+  // Feature to sample mapping for Adobe Express add-on samples
+private featureToSamplePathMap: Record<string, { path: string; framework: string }> = {
+    'dialog-api': { 
+        path: 'dialog-add-on/src/components/App.jsx',
+        framework: 'react'
+    },
+    'export-assets': { 
+        path: 'export-assets-from-document/src/components/ExportContainer.jsx',
+        framework: 'react'
+    },
+    'import-local-images': { 
+        path: 'import-images-from-local/src/index.js',
+        framework: 'vanilla'
+    },
+    'drag-and-drop': { 
+        path: 'import-images-from-local/src/index.js',
+        framework: 'vanilla'
+    },
+    'oauth-authentication': { 
+        path: 'import-images-using-oauth/src/components/Assets.jsx',
+        framework: 'react'
+    },
+    'client-storage': { 
+        path: 'use-client-storage/src/index.ts',
+        framework: 'vanilla'
+    },
+    'add-image-to-document': { 
+        path: 'import-images-from-local/src/index.js',
+        framework: 'vanilla'
+    }
+};
+
   constructor() {
     if (!GITHUB_TOKEN) {
       console.error("GitHubDocService: MCP_GITHUB_PAT environment variable not set. GitHub API requests will be unauthenticated and heavily rate-limited.");
@@ -380,5 +429,173 @@ export class GitHubDocService {
     }
     
     return results.filter(item => item.content.trim() !== '');
+  }
+
+  /**
+   * Get code sample for a specific feature from GitHub
+   * @param feature Feature name to get code sample for
+   * @param language Preferred language for the sample
+   * @param framework Preferred framework for the sample
+   * @returns Code sample result or null if not found
+   */
+  async getCodeSample(feature: string, language?: string, framework?: string): Promise<CodeSampleResult | null> {
+    if (!GITHUB_TOKEN) {
+      console.error("GitHubDocService: GitHub token not available for code sample fetch");
+      return null;
+    }
+
+    // Check if we have a mapping for this feature
+    const sampleInfo = this.featureToSamplePathMap[feature as keyof typeof this.featureToSamplePathMap];
+    if (!sampleInfo) {
+      console.error(`GitHubDocService: No sample mapping found for feature '${feature}'`);
+      return null;
+    }
+
+    try {
+      const filePath = `${SAMPLES_BASE_PATH}/${sampleInfo.path}`;
+      console.error(`GitHubDocService: Fetching code sample for '${feature}' from path: ${filePath}`);
+      
+      const response = await octokit.repos.getContent({
+        owner: SAMPLES_REPO_OWNER,
+        repo: SAMPLES_REPO_NAME,
+        path: filePath
+      });
+
+      const validation = GitHubAPIRepoContentFileSchema.safeParse(response.data);
+      if (!validation.success) {
+        console.error(`GitHubDocService - Sample file at ${filePath} did not return valid file content`);
+        return null;
+      }
+
+      const validatedFileData = validation.data;
+      const decodedContent = Buffer.from(validatedFileData.content, 'base64').toString('utf-8');
+      
+      // Extract the relevant code snippet from the file
+      // This is a simple extraction example, could be more sophisticated
+      const extractedCode = this.extractRelevantCodeForFeature(decodedContent, feature);
+      
+      return {
+        code: extractedCode,
+        language: language || 'javascript',
+        filePath: filePath,
+        html_url: validatedFileData.html_url || '',
+        feature: feature,
+        framework: sampleInfo.framework
+      };
+    } catch (error: any) {
+      console.error(`GitHubDocService: Error fetching code sample for '${feature}':`, error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Extract the most relevant code snippet for a given feature
+   * @param fullCode Full source code content
+   * @param feature Feature to extract code for
+   * @returns Extracted code snippet
+   */
+  private extractRelevantCodeForFeature(fullCode: string, feature: string): string {
+    // This could be more sophisticated based on specific features
+    // For now, we'll use some heuristics to extract relevant parts
+
+    // Map features to regex patterns or keywords to look for
+    const featureKeywordMap: Record<string, string[]> = {
+      'dialog-api': ['showModalDialog', 'dialog', 'alert', 'confirm'],
+      'export-assets': ['createRenditions', 'export', 'download'],
+      'import-local-images': ['addImage', 'importImage', 'fileInput'],
+      'drag-and-drop': ['enableDragToDocument', 'dragstart', 'dragend'],
+      'oauth-authentication': ['oauth', 'authorize', 'accessToken'],
+      'client-storage': ['clientStorage', 'setItem', 'getItem'],
+      'add-image-to-document': ['addImage', 'document.addImage']
+    };
+
+    const keywords = featureKeywordMap[feature] || [];
+    if (!keywords.length) return fullCode;
+
+    // Look for functions or methods containing the keywords
+    const codeLines = fullCode.split('\n');
+    let relevantCode = '';
+    let inRelevantBlock = false;
+    let bracketCount = 0;
+
+    for (let i = 0; i < codeLines.length; i++) {
+      const line = codeLines[i];
+      
+      // Check if this line contains a keyword and looks like a function start
+      const startsRelevantBlock = !inRelevantBlock && 
+        keywords.some(keyword => line.toLowerCase().includes(keyword.toLowerCase())) &&
+        (line.includes('function') || line.includes('=>') || line.includes('const') || line.includes('async'));
+      
+      if (startsRelevantBlock) {
+        // Include a few lines before for context
+        const startLine = Math.max(0, i - 5);
+        relevantCode = codeLines.slice(startLine, i).join('\n') + '\n';
+        inRelevantBlock = true;
+      }
+      
+      if (inRelevantBlock) {
+        relevantCode += line + '\n';
+        
+        // Count braces to track block ending
+        bracketCount += (line.match(/{/g) || []).length;
+        bracketCount -= (line.match(/}/g) || []).length;
+        
+        // End of a code block
+        if (bracketCount === 0 && line.includes('}')) {
+          // Include a few lines after for context
+          const endLine = Math.min(codeLines.length, i + 3);
+          relevantCode += codeLines.slice(i + 1, endLine).join('\n');
+          break;
+        }
+      }
+    }
+    
+    // If we couldn't extract a specific block, return a reasonable portion of the code
+    if (!relevantCode.trim()) {
+      // Find imports section first
+      let importSection = '';
+      for (const line of codeLines) {
+        if (line.startsWith('import')) {
+          importSection += line + '\n';
+        } else if (importSection && line.trim() === '') {
+          importSection += '\n';
+          break;
+        }
+      }
+      
+      // Try to find a component or function that seems central to the file
+      const componentMatch = fullCode.match(/function\s+([A-Z][A-Za-z0-9]*)\s*\(/);
+      if (componentMatch) {
+        const componentName = componentMatch[1];
+        let componentBlock = '';
+        inRelevantBlock = false;
+        bracketCount = 0;
+        
+        for (let i = 0; i < codeLines.length; i++) {
+          const line = codeLines[i];
+          if (!inRelevantBlock && line.includes(`function ${componentName}`)) {
+            inRelevantBlock = true;
+          }
+          
+          if (inRelevantBlock) {
+            componentBlock += line + '\n';
+            bracketCount += (line.match(/{/g) || []).length;
+            bracketCount -= (line.match(/}/g) || []).length;
+            
+            if (bracketCount === 0 && line.includes('}')) {
+              break;
+            }
+          }
+        }
+        
+        // Return imports + main component
+        return importSection + componentBlock;
+      }
+      
+      // If no suitable component found, return the first 50 lines or so
+      return codeLines.slice(0, Math.min(50, codeLines.length)).join('\n');
+    }
+    
+    return relevantCode;
   }
 }

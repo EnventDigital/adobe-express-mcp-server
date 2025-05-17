@@ -8,7 +8,7 @@ The server provides the following tools:
 
 ### Developer Tools
 1. **Scaffold Add-on Project** - Create a new Adobe Express add-on project based on sample templates
-2. **Get Code Examples** - Retrieve code examples for common Adobe Express add-on features
+2. **Get Code Examples** - Retrieve code examples for common Adobe Express add-on features (dynamically fetched from GitHub when in GitHub mode)
 3. **Implement Feature** - Get implementation guidance for adding specific features to an Adobe Express add-on
 
 ### Documentation Tools
