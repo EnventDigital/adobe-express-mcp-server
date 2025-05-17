@@ -145,6 +145,37 @@ Here are some example prompts to try with Claude and this MCP server:
 - "Find documentation about spectrum-tooltip components"
 - "Switch to local documentation mode"
 
+## Using with VS Code
+
+This MCP server is configured to work with VS Code's Copilot agent mode. Follow these steps to use it:
+
+### Prerequisites
+
+- Visual Studio Code (version 1.99 or newer)
+- GitHub Copilot extension
+- Node.js environment
+
+### Setup
+
+1. Make sure you've built the project: `npm run build`
+2. The server is already configured via the `.vscode/mcp.json` file
+3. In VS Code, ensure the `chat.mcp.enabled` setting is turned on
+4. Open the Command Palette and run `MCP: List Servers` to see the available servers
+5. Start the `adobeExpressDev` server from the list
+6. When prompted, enter your GitHub Personal Access Token for accessing code samples
+
+### Usage with Copilot
+
+1. Open the VS Code Chat view (Ctrl+Alt+I or Cmd+I)
+2. Select "Agent mode" from the dropdown
+3. Click on the "Tools" button to see available tools, including Adobe Express developer tools
+4. Ask questions like:
+   - "Create a new Adobe Express add-on that uses the dialog API"
+   - "Show me code examples for importing images in an Express add-on"
+   - "How do I implement OAuth authentication in my add-on?"
+
+The MCP server enhances Copilot with specialized Adobe Express add-on development knowledge and code examples drawn directly from the official samples repository.
+
 ## License
 
 MIT
