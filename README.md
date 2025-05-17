@@ -6,9 +6,16 @@ This is a Model Context Protocol (MCP) server for Adobe Express integration with
 
 The server provides the following tools:
 
+### Adobe Express Tools
 1. **Generate Graphic** - Generate an image or graphic using Adobe Express templates
 2. **Edit Image** - Edit an existing image using Adobe Express tools
 3. **List Templates** - List available Adobe Express templates
+4. **Create Document** - Create a document or presentation using Adobe Express
+
+### Documentation Tools
+1. **Get Assistant Capabilities** - Get information about the assistant's capabilities
+2. **Set Knowledge Source** - Switch between GitHub API and local documentation modes
+3. **Query Documentation** - Search Adobe Express SDK and Spectrum Web Components documentation
 
 ## Installation
 
@@ -32,7 +39,47 @@ npm run dev
 
 # Start the server
 npm start
+
+# Parse documentation repositories for local mode
+npm run parse-docs
 ```
+
+## Documentation Sources
+
+This MCP server can access documentation from two sources:
+
+### 1. GitHub Mode (Default)
+
+In GitHub mode, the server uses the GitHub API to search and fetch documentation from:
+- [Adobe Express Add-ons Documentation](https://github.com/AdobeDocs/express-add-ons-docs)
+- [Spectrum Web Components](https://github.com/adobe/spectrum-web-components)
+
+To use GitHub mode, you need to create a GitHub Personal Access Token (PAT) and add it to your `.env` file:
+
+```bash
+MCP_GITHUB_PAT=your_github_token_here
+```
+
+### 2. Local Mode
+
+In local mode, the server uses pre-parsed documentation stored in a local knowledge base file. To generate this file:
+
+1. Clone the documentation repositories:
+```bash
+mkdir -p adobe-docs-repo
+git clone https://github.com/AdobeDocs/express-add-ons-docs.git adobe-docs-repo/express-add-ons-docs
+git clone https://github.com/adobe/spectrum-web-components.git adobe-docs-repo/spectrum-web-components
+```
+
+2. Build the project and run the parser:
+```bash
+npm run build
+npm run parse-docs
+```
+
+3. This creates a `dist/knowledge_base.json` file with parsed documentation.
+
+You can switch between modes using the "setKnowledgeSource" tool or by setting the `KNOWLEDGE_SOURCE_MODE` in your `.env` file.
 
 ## Usage with Claude for Desktop
 
@@ -85,9 +132,18 @@ To use this MCP server with Claude for Desktop:
 
 Here are some example prompts to try with Claude and this MCP server:
 
+### Adobe Express Tool Examples
 - "Create a social media post about our new product launch"
 - "Edit my profile image to remove the background"
 - "Show me available presentation templates"
+- "Create a business flyer for a grand opening"
+
+### Documentation Tool Examples
+- "What capabilities does this MCP server have?"
+- "Search for documentation about Spectrum Web Components buttons"
+- "How do I use the Adobe Express SDK in my add-on?"
+- "Find documentation about spectrum-tooltip components"
+- "Switch to local documentation mode"
 
 ## License
 
