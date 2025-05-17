@@ -1,16 +1,15 @@
 # Adobe Express MCP Server
 
-This is a Model Context Protocol (MCP) server for Adobe Express integration with LLMs like Claude. It provides tools to interact with Adobe Express features directly from LLM interfaces.
+This is a Model Context Protocol (MCP) server designed for Adobe Express Add-on developers. It provides developer-focused tools to assist with building Adobe Express add-ons and integrating with Adobe Express SDK.
 
 ## Features
 
 The server provides the following tools:
 
-### Adobe Express Tools
-1. **Generate Graphic** - Generate an image or graphic using Adobe Express templates
-2. **Edit Image** - Edit an existing image using Adobe Express tools
-3. **List Templates** - List available Adobe Express templates
-4. **Create Document** - Create a document or presentation using Adobe Express
+### Developer Tools
+1. **Scaffold Add-on Project** - Create a new Adobe Express add-on project based on sample templates
+2. **Get Code Examples** - Retrieve code examples for common Adobe Express add-on features
+3. **Implement Feature** - Get implementation guidance for adding specific features to an Adobe Express add-on
 
 ### Documentation Tools
 1. **Get Assistant Capabilities** - Get information about the assistant's capabilities
@@ -126,17 +125,18 @@ To use this MCP server with Claude for Desktop:
    
    ![MCP Tools Icon](https://mintlify.s3.us-west-1.amazonaws.com/mcp/images/claude-desktop-mcp-hammer-icon.svg)
 
-7. You can now use prompts like "Create a social media graphic for a product launch" and Claude will suggest using the Adobe Express tools
+7. You can now use prompts like "Help me scaffold a dialog add-on project" or "Show me code examples for the Dialog API" and Claude will use the developer tools
 
 ## Example Prompts
 
 Here are some example prompts to try with Claude and this MCP server:
 
-### Adobe Express Tool Examples
-- "Create a social media post about our new product launch"
-- "Edit my profile image to remove the background"
-- "Show me available presentation templates"
-- "Create a business flyer for a grand opening"
+### Developer Tool Examples
+- "Help me scaffold a new dialog add-on project"
+- "Show me code examples for importing local images in an Adobe Express add-on"
+- "How do I implement drag-and-drop functionality in my add-on?"
+- "Give me a code example of using the Dialog API"
+- "Help me implement OAuth authentication in my Express add-on"
 
 ### Documentation Tool Examples
 - "What capabilities does this MCP server have?"
