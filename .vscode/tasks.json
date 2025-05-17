@@ -4,6 +4,7 @@
     {
       "label": "Build",
       "type": "shell",
+      
       "command": "npm",
       "args": ["run", "build"],
       "group": "build",
