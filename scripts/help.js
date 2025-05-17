@@ -19,6 +19,6 @@ console.log('\n3. express-mcp-help');
 console.log('   Displays this help message');
 console.log('   Usage: express-mcp-help');
 console.log('\nFor more information, visit:');
-console.log('https://github.com/your-org/adobe-express-mcp-server');
+console.log('https://github.com/Sandgrouse/adobe-express-mcp-server');
 console.log('='.repeat(80));
 console.log('\n');

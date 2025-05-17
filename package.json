@@ -5,15 +5,15 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "express-mcp-install": "./scripts/install-in-vscode.js",
-    "express-mcp-workspace": "./scripts/install-to-workspace.js",
-    "express-mcp-help": "./scripts/help.js"
+    "express-mcp-install": "scripts/install-in-vscode.js",
+    "express-mcp-workspace": "scripts/install-to-workspace.js",
+    "express-mcp-help": "scripts/help.js"
   },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsc -w & node --watch dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"No tests specified yet\" && exit 0",
     "parse-docs": "node dist/scripts/parse_docs.js",
     "install-in-vscode": "node scripts/install-in-vscode.js",
     "install-to-workspace": "node scripts/install-to-workspace.js",
@@ -27,16 +27,16 @@
     "express",
     "llm"
   ],
-  "author": "",
+  "author": "Geoffrey Nwachukwu <geoff@edgidesign.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/adobe-express-mcp-server.git"
+    "url": "git+https://github.com/Sandgrouse/adobe-express-mcp-server.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/adobe-express-mcp-server/issues"
+    "url": "https://github.com/Sandgrouse/adobe-express-mcp-server/issues"
   },
-  "homepage": "https://github.com/your-org/adobe-express-mcp-server#readme",
+  "homepage": "https://github.com/Sandgrouse/adobe-express-mcp-server#readme",
   "engines": {
     "node": ">=18.0.0"
   },

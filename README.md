@@ -34,8 +34,8 @@ express-mcp-install
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/adobe-express-mcp-server.git
-cd adobe-express-mcp-server
+git clone https://github.com/Sandgrouse/adobe-express-mcp-server.git
+cd Adobe-Express-MCP-server
 
 # Install dependencies
 npm install
@@ -58,7 +58,7 @@ express-mcp-workspace
 
 # If installed from GitHub:
 cd /path/to/your/project
-/path/to/adobe-express-mcp-server/scripts/install-to-workspace.js
+/path/to/Adobe-Express-MCP-server/scripts/install-to-workspace.js
 ```
 
 This will create a `.vscode/mcp.json` file in your project that configures the Adobe Express MCP server for that workspace.
@@ -142,7 +142,7 @@ To use this MCP server with Claude for Desktop:
     "adobe-express": {
       "command": "node",
       "args": [
-        "/ABSOLUTE/PATH/TO/adobe-express-mcp-server/dist/index.js"
+        "/ABSOLUTE/PATH/TO/Adobe-Express-MCP-server/dist/index.js"
       ]
     }
   }
@@ -152,7 +152,7 @@ To use this MCP server with Claude for Desktop:
 4. Replace `/ABSOLUTE/PATH/TO/` with the actual path to your project.
    For example:
    ```
-   "/Users/username/Documents/adobe-express-mcp-server/dist/index.js"
+   "/Users/username/Documents/Adobe-Express-MCP-server/dist/index.js"
    ```
    
 5. Save the file and restart Claude for Desktop
