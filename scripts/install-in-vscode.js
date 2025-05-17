@@ -7,19 +7,48 @@
  * in VS Code with one click, and also provides the command line version.
  */
 
-const path = require('path');
-const { execSync } = require('child_process');
+import * as path from 'path';
+import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
 
 // Get the absolute path to the package directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const projectDir = path.resolve(__dirname, '..');
 const serverPath = path.join(projectDir, 'dist', 'index.js');
 
-// Create the configuration object
+// Determine if this is installed as a package or running locally
+const isInstalledAsPackage = !projectDir.includes('MCP-server');
+
+// Create the configuration object based on installation method
 const mcpConfig = {
   name: "adobeExpressDev",
   type: "stdio",
   command: "node",
   args: [serverPath]
+};
+
+// Add environment variable input parameters
+mcpConfig.inputs = [
+  {
+    "type": "promptString",
+    "id": "github-pat",
+    "description": "GitHub Personal Access Token for accessing Adobe Express samples repository",
+    "password": true
+  },
+  {
+    "type": "pickString",
+    "id": "knowledge-source-mode",
+    "description": "Knowledge source mode for documentation",
+    "options": ["github", "local"],
+    "default": "github"
+  }
+];
+
+// Add environment variables
+mcpConfig.env = {
+  "MCP_GITHUB_PAT": "${input:github-pat}",
+  "KNOWLEDGE_SOURCE_MODE": "${input:knowledge-source-mode}"
 };
 
 // URL encode the configuration

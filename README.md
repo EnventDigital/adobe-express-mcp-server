@@ -18,14 +18,50 @@ The server provides the following tools:
 
 ## Installation
 
+You can install the Adobe Express MCP Server in several ways:
+
+### Method 1: Install from NPM
+
+```bash
+# Install globally
+npm install -g adobe-express-mcp-server
+
+# Run the VS Code installation script
+express-mcp-install
+```
+
+### Method 2: Install from GitHub
+
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/your-org/adobe-express-mcp-server.git
 cd adobe-express-mcp-server
 
 # Install dependencies
 npm install
+
+# Build the project
+npm run build
+
+# Run the VS Code installation script
+npm run install-in-vscode
 ```
+
+### Method 3: Install in a specific VS Code workspace
+
+If you want to use the MCP server in a specific VS Code workspace:
+
+```bash
+# If installed globally from NPM:
+cd /path/to/your/project
+express-mcp-workspace
+
+# If installed from GitHub:
+cd /path/to/your/project
+/path/to/adobe-express-mcp-server/scripts/install-to-workspace.js
+```
+
+This will create a `.vscode/mcp.json` file in your project that configures the Adobe Express MCP server for that workspace.
 
 ## Development
 
@@ -147,22 +183,40 @@ Here are some example prompts to try with Claude and this MCP server:
 
 ## Using with VS Code
 
-This MCP server is configured to work with VS Code's Copilot agent mode. Follow these steps to use it:
+This MCP server is configured to work with VS Code's GitHub Copilot agent mode. Follow these steps to use it:
 
 ### Prerequisites
 
 - Visual Studio Code (version 1.99 or newer)
 - GitHub Copilot extension
-- Node.js environment
+- Node.js environment (v18 or newer recommended)
 
 ### Setup
 
+#### Option 1: Using the Installation Scripts
+
+The easiest way to set up the MCP server in VS Code is to use one of the installation methods described in the [Installation](#installation) section above. These scripts will:
+
+1. Create the correct configuration for the MCP server
+2. Generate a one-click URL to install in VS Code
+3. Automatically prompt for the GitHub PAT when needed
+
+#### Option 2: Manual Setup
+
+If you prefer to set up manually:
+
 1. Make sure you've built the project: `npm run build`
-2. The server is already configured via the `.vscode/mcp.json` file
-3. In VS Code, ensure the `chat.mcp.enabled` setting is turned on
-4. Open the Command Palette and run `MCP: List Servers` to see the available servers
-5. Start the `adobeExpressDev` server from the list
-6. When prompted, enter your GitHub Personal Access Token for accessing code samples
+2. Configure the server by:
+   - Using the global MCP configuration in VS Code settings
+   - OR using the workspace-specific `.vscode/mcp.json` file (already included in this project)
+3. In VS Code, ensure the `chat.mcp.enabled` setting is turned on:
+   - Open settings (Ctrl+, or Cmd+,)
+   - Search for `chat.mcp.enabled`
+   - Make sure it's checked
+4. Open the Command Palette (Ctrl+Shift+P or Cmd+Shift+P)
+5. Run `MCP: List Servers` to see the available servers
+6. Start the `adobeExpressDev` server from the list
+7. When prompted, enter your GitHub Personal Access Token for accessing code samples
 
 ### Usage with Copilot
 
@@ -175,6 +229,31 @@ This MCP server is configured to work with VS Code's Copilot agent mode. Follow 
    - "How do I implement OAuth authentication in my add-on?"
 
 The MCP server enhances Copilot with specialized Adobe Express add-on development knowledge and code examples drawn directly from the official samples repository.
+
+## NPM Package
+
+The Adobe Express MCP Server is available as an npm package that you can install globally or as a dependency in your project:
+
+```bash
+# Install globally
+npm install -g adobe-express-mcp-server
+
+# Or install as a dev dependency in your project
+npm install --save-dev adobe-express-mcp-server
+```
+
+After installation, you can use the following commands:
+
+```bash
+# Install globally in VS Code
+express-mcp-install
+
+# Install in current workspace
+express-mcp-workspace
+
+# Show help
+express-mcp-help
+```
 
 ## License
 
