@@ -5,6 +5,7 @@ import { GitHubDocService, MCPResultItem } from './github_doc_service.js';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
 
 // Define ServerInfo type
 interface ServerInfo {
@@ -15,6 +16,10 @@ interface ServerInfo {
 
 // Load environment variables
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 // --- Knowledge Base Configuration ---
 let LOCAL_KNOWLEDGE_BASE: MCPResultItem[] = [];
@@ -65,6 +70,20 @@ const SetKnowledgeSourceInputSchema = z.object({
   mode: z.enum(['github', 'local']),
 });
 
+// Define MCPResultItemSchema for proper validation
+const MCPResultItemSchema = z.object({
+  type: z.string(),
+  title: z.string(),
+  content: z.string(),
+  raw_markdown_content: z.string().optional(),
+  source_hint: z.string(),
+  tags: z.array(z.string()).optional(),
+  language: z.string().optional(),
+  frontmatter: z.record(z.any()).optional(),
+  parent_title: z.string().optional(),
+  dataSource: z.enum(['express_sdk', 'spectrum_web_components', 'code_sample', 'unknown'])
+});
+
 // --- TypeScript Interfaces ---
 interface QueryDocumentationOutput {
   query_received: string;
@@ -100,10 +119,21 @@ if (currentKnowledgeMode === 'github' && !process.env.MCP_GITHUB_PAT) {
 }
 
 // Register documentation tools
+// Create an output schema for getAssistantCapabilities
+const AssistantCapabilitiesOutputSchema = {
+  agent_name: { type: "string" },
+  description: { type: "string" },
+  supported_query_keywords: { type: "array", items: { type: "string" }, optional: true },
+  documentation_source: { type: "string" },
+  current_knowledge_mode: { type: "string", enum: ["github", "local"] },
+  available_knowledge_modes: { type: "array", items: { type: "string", enum: ["github", "local"] } }
+};
+
 server.tool(
   "getAssistantCapabilities",
   "Get the current capabilities, status, and configuration of the Adobe Express & Spectrum Assistant.",
   {}, // Empty object for params
+  AssistantCapabilitiesOutputSchema, // Direct schema object
   async (_args, _extra) => {
     const allTags = new Set<string>();
     if (currentKnowledgeMode === 'local' && LOCAL_KNOWLEDGE_BASE.length > 0) {
@@ -132,7 +162,14 @@ server.tool(
     
     // Return in MCP-compatible format
     return {
-      structuredContent: capabilities as unknown as Record<string, unknown>,
+      structuredContent: {
+        agent_name: capabilities.agent_name,
+        description: capabilities.description,
+        supported_query_keywords: capabilities.supported_query_keywords,
+        documentation_source: capabilities.documentation_source,
+        current_knowledge_mode: capabilities.current_knowledge_mode,
+        available_knowledge_modes: capabilities.available_knowledge_modes
+      },
       content: [
         {
           type: "text",
@@ -143,10 +180,18 @@ server.tool(
   }
 );
 
+// Create an output schema for setKnowledgeSource
+const SetKnowledgeSourceOutputSchema = {
+  status: { type: "string" },
+  message: { type: "string" },
+  new_mode: { type: "string", enum: ["github", "local"] }
+};
+
 server.tool(
   "setKnowledgeSource",
   "Set the knowledge source mode for the assistant (github or local).",
   SetKnowledgeSourceInputSchema.shape, // Extract the schema shape
+  SetKnowledgeSourceOutputSchema, // Direct schema object
   async (validatedPayload) => {
     currentKnowledgeMode = validatedPayload.mode;
     console.error(`Knowledge source mode changed to: ${currentKnowledgeMode}`);
@@ -169,10 +214,20 @@ server.tool(
   }
 );
 
+// Create a Zod output schema for queryDocumentation
+const QueryDocumentationOutputZodSchema = z.object({
+  query_received: z.string(),
+  results: z.array(MCPResultItemSchema),
+  confidence_score: z.number(),
+  mode_used: z.enum(["github", "local"])
+});
+
+// Register the queryDocumentation tool
 server.tool(
   "queryDocumentation",
   "Query the Adobe Express SDK and Spectrum Web Components documentation.",
-  QueryDocumentationInputSchema.shape, // Extract the schema shape
+  QueryDocumentationInputSchema.shape, // Use Zod shape for input schema
+  QueryDocumentationOutputZodSchema.shape, // Use Zod shape for output schema
   async (validatedPayload) => {
     const query_text = validatedPayload.query_text;
     const target_source_hint = validatedPayload.target_source;
@@ -297,8 +352,14 @@ server.tool(
       return `\n## ${r.title}\n${r.content.substring(0, 300)}${r.content.length > 300 ? '...' : ''}\n`; 
     }).join('\n');
 
+    // Return in MCP-compatible format, ensuring the structure matches the output schema exactly
     return {
-      structuredContent: outputResult as unknown as Record<string, unknown>,
+      structuredContent: {
+        query_received: query_text,
+        results: results.slice(0, 10),
+        confidence_score: confidence_score || 0.1, // Ensure it's never undefined
+        mode_used: currentKnowledgeMode
+      },
       content: [
         {
           type: "text",
@@ -360,10 +421,18 @@ const ImplementFeatureInputSchema = z.object({
 });
 
 // Register Adobe Express Add-on Developer Tools
+// Create an output schema for scaffold-addon-project
+const ScaffoldAddonOutputSchema = {
+  projectType: { type: "string" },
+  projectName: { type: "string" },
+  description: { type: "string" }
+};
+
 server.tool(
   "scaffold-addon-project",
   "Scaffold a new Adobe Express add-on project based on sample templates",
   ScaffoldAddOnInputSchema.shape,
+  ScaffoldAddonOutputSchema,
   async ({ projectType, projectName, description, destination }) => {
     const descText = description || `An Adobe Express add-on for ${projectType}`;
     
@@ -830,3 +899,21 @@ function getFeatureComponents(feature: string, language: string, framework: stri
       return `Key components for ${formatFeatureName(feature)} will be provided based on your specific requirements.`;
   }
 }
+
+// Main function to start the server
+async function main() {
+  try {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Adobe Express MCP Server running on stdio");
+  } catch (error) {
+    console.error("Error starting MCP server:", error);
+    process.exit(1);
+  }
+}
+
+// Execute the main function
+main().catch(error => {
+  console.error("Unhandled error:", error);
+  process.exit(1);
+});

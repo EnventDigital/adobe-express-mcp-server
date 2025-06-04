@@ -255,6 +255,42 @@ express-mcp-workspace
 express-mcp-help
 ```
 
+## Troubleshooting
+
+### Error: Tool has no outputSchema but returned structuredContent
+
+If you encounter this error:
+```
+Error: MPC -32603: MCP error -32603: Tool queryDocumentation has no outputSchema but returned structuredContent
+```
+
+This indicates that the MCP tool is returning structured content but doesn't have an output schema defined correctly. This has been fixed in version 1.0.1+.
+
+Solution:
+1. Make sure you're using the latest version of the MCP server
+2. Rebuild the server with `npm run build`
+3. Restart the MCP server in your editor
+
+If you're still experiencing issues:
+1. Check that the output schema format follows the MCP schema format (not using Zod's `.shape` property)
+2. Ensure the `structuredContent` object structure matches the defined output schema
+3. Test the server locally with the included test script: `npm run test-server`
+
+### Error: "cb is not a function" 
+
+This error typically occurs when the callback format is incorrect in a tool function or when the tool's return value doesn't match the expected format.
+
+Solution:
+1. Make sure your tool output is in the correct format: `{ structuredContent: {...}, content: [...] }`
+2. Avoid using TypeScript interfaces directly as return values; instead, create a plain object that matches the schema
+3. Check that all required fields in the output schema are present in the structuredContent object
+
+### Other Common Issues
+
+- **GitHub API Rate Limiting**: If you're in GitHub mode and don't provide a GitHub Personal Access Token (PAT), you may hit rate limits.
+- **Knowledge Base Not Loading**: If using local mode, ensure the `knowledge_base.json` file exists in the project root.
+- **Command Not Found**: Ensure you've built the project with `npm run build` before trying to run the server.
+
 ## License
 
 MIT

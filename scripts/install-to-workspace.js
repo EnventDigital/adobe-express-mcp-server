@@ -47,7 +47,7 @@ const mcpConfig = {
     "adobeExpressDev": {
       "type": "stdio",
       "command": "node",
-      "args": [path.join(projectDir, 'dist', 'index.js')],
+      "args": [path.join(projectDir, 'dist', 'src', 'index.js')],
       "env": {
         "MCP_GITHUB_PAT": "${input:github-pat}",
         "KNOWLEDGE_SOURCE_MODE": "${input:knowledge-source-mode}"

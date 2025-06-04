@@ -19,7 +19,7 @@
     "adobeExpressDev": {
       "type": "stdio",
       "command": "node",
-      "args": ["${workspaceFolder}/dist/index.js"],
+      "args": ["${workspaceFolder}/dist/src/index.js"],
       "env": {
         "MCP_GITHUB_PAT": "${input:github-pat}",
         "KNOWLEDGE_SOURCE_MODE": "${input:knowledge-source-mode}"
