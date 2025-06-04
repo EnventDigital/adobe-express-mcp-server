@@ -108,12 +108,27 @@ const QueryDocumentationOutputJsonSchema = {
     query_received: { type: "string" },
     results: {
       type: "array",
-      items: MCPResultItemJsonSchema // Embed the schema directly
+      items: { // Start of inlined MCPResultItemJsonSchema
+        type: "object",
+        properties: {
+          type: { type: "string" },
+          title: { type: "string" },
+          content: { type: "string" },
+          raw_markdown_content: { type: "string" },
+          source_hint: { type: "string" },
+          tags: { type: "array", items: { type: "string" } },
+          language: { type: "string" },
+          frontmatter: { type: "object", additionalProperties: true },
+          parent_title: { type: "string" },
+          dataSource: { type: "string", enum: ['express_sdk', 'spectrum_web_components', 'code_sample', 'unknown'] }
+        },
+        required: ["type", "title", "content", "source_hint", "dataSource"]
+      } // End of inlined MCPResultItemJsonSchema
     },
     confidence_score: { type: "number" },
     mode_used: { type: "string", enum: ["github", "local"] }
   },
-  required: ["query_received", "results"] // confidence_score and mode_used are optional
+  required: ["query_received", "results"]
 };
 
 // --- TypeScript Interfaces ---
@@ -262,6 +277,8 @@ const QueryDocumentationOutputZodSchema = z.object({
   mode_used: z.enum(["github", "local"])
 });
 
+console.error("Attempting to register queryDocumentation. Output schema being used:");
+console.error("QueryDocumentationOutputJsonSchema:", JSON.stringify(QueryDocumentationOutputJsonSchema, null, 2));
 // Register the queryDocumentation tool
 server.tool(
   "queryDocumentation",
@@ -391,6 +408,14 @@ server.tool(
     const resultText = results.map(r => {
       return `\n## ${r.title}\n${r.content.substring(0, 300)}${r.content.length > 300 ? '...' : ''}\n`; 
     }).join('\n');
+
+    const structuredOutputForLogging = {
+        query_received: outputResult.query_received,
+        results: outputResult.results,
+        confidence_score: outputResult.confidence_score,
+        mode_used: outputResult.mode_used
+    };
+    console.error("queryDocumentation handler - structuredContent being returned:", JSON.stringify(structuredOutputForLogging, null, 2));
 
     // Return in MCP-compatible format, ensuring the structure matches the output schema exactly
     return {
