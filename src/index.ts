@@ -70,6 +70,15 @@ const SetKnowledgeSourceInputSchema = z.object({
   mode: z.enum(['github', 'local']),
 });
 
+const AssistantCapabilitiesOutputZodSchema = z.object({
+  agent_name: z.string(),
+  description: z.string(),
+  supported_query_keywords: z.array(z.string()).optional(),
+  documentation_source: z.string(),
+  current_knowledge_mode: z.enum(['github', 'local']),
+  available_knowledge_modes: z.array(z.enum(['github', 'local']))
+});
+
 // Define MCPResultItemSchema for proper validation
 const MCPResultItemSchema = z.object({
   type: z.string(),
@@ -181,12 +190,12 @@ const AssistantCapabilitiesOutputJsonSchema = {
 };
 
 console.error("Attempting to register getAssistantCapabilities. Output schema being used:");
-console.error("AssistantCapabilitiesOutputJsonSchema:", JSON.stringify(AssistantCapabilitiesOutputJsonSchema, null, 2));
+console.error("AssistantCapabilitiesOutputZodSchema.shape:", JSON.stringify(AssistantCapabilitiesOutputZodSchema.shape, null, 2));
 server.tool(
   "getAssistantCapabilities",
   "Get the current capabilities, status, and configuration of the Adobe Express & Spectrum Assistant.",
   {}, // Empty object for params
-  AssistantCapabilitiesOutputJsonSchema, // Use wrapped JSON schema for output
+  AssistantCapabilitiesOutputZodSchema.shape, // Use wrapped JSON schema for output
   async (_args, _extra) => {
     const allTags = new Set<string>();
     if (currentKnowledgeMode === 'local' && LOCAL_KNOWLEDGE_BASE.length > 0) {
