@@ -119,21 +119,25 @@ if (currentKnowledgeMode === 'github' && !process.env.MCP_GITHUB_PAT) {
 }
 
 // Register documentation tools
-// Create an output schema for getAssistantCapabilities
-const AssistantCapabilitiesOutputSchema = {
-  agent_name: { type: "string" },
-  description: { type: "string" },
-  supported_query_keywords: { type: "array", items: { type: "string" }, optional: true },
-  documentation_source: { type: "string" },
-  current_knowledge_mode: { type: "string", enum: ["github", "local"] },
-  available_knowledge_modes: { type: "array", items: { type: "string", enum: ["github", "local"] } }
+// Create a JSON output schema for getAssistantCapabilities
+const AssistantCapabilitiesOutputJsonSchema = {
+  type: "object",
+  properties: {
+    agent_name: { type: "string" },
+    description: { type: "string" },
+    supported_query_keywords: { type: "array", items: { type: "string" } },
+    documentation_source: { type: "string" },
+    current_knowledge_mode: { type: "string", enum: ["github", "local"] },
+    available_knowledge_modes: { type: "array", items: { type: "string", enum: ["github", "local"] } }
+  },
+  required: ["agent_name", "description", "documentation_source", "current_knowledge_mode", "available_knowledge_modes"]
 };
 
 server.tool(
   "getAssistantCapabilities",
   "Get the current capabilities, status, and configuration of the Adobe Express & Spectrum Assistant.",
   {}, // Empty object for params
-  AssistantCapabilitiesOutputSchema, // Direct schema object
+  AssistantCapabilitiesOutputJsonSchema, // Use wrapped JSON schema for output
   async (_args, _extra) => {
     const allTags = new Set<string>();
     if (currentKnowledgeMode === 'local' && LOCAL_KNOWLEDGE_BASE.length > 0) {
