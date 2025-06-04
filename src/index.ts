@@ -180,6 +180,8 @@ const AssistantCapabilitiesOutputJsonSchema = {
   required: ["agent_name", "description", "documentation_source", "current_knowledge_mode", "available_knowledge_modes"]
 };
 
+console.error("Attempting to register getAssistantCapabilities. Output schema being used:");
+console.error("AssistantCapabilitiesOutputJsonSchema:", JSON.stringify(AssistantCapabilitiesOutputJsonSchema, null, 2));
 server.tool(
   "getAssistantCapabilities",
   "Get the current capabilities, status, and configuration of the Adobe Express & Spectrum Assistant.",
@@ -211,16 +213,19 @@ server.tool(
       available_knowledge_modes: availableKnowledgeModes,
     };
     
-    // Return in MCP-compatible format
-    return {
-      structuredContent: {
+    const structuredContentForReturn = {
         agent_name: capabilities.agent_name,
         description: capabilities.description,
         supported_query_keywords: capabilities.supported_query_keywords,
         documentation_source: capabilities.documentation_source,
         current_knowledge_mode: capabilities.current_knowledge_mode,
         available_knowledge_modes: capabilities.available_knowledge_modes
-      },
+    };
+    console.error("getAssistantCapabilities handler - structuredContent being returned:", JSON.stringify(structuredContentForReturn, null, 2));
+
+    // Return in MCP-compatible format
+    return {
+      structuredContent: structuredContentForReturn,
       content: [
         {
           type: "text",
