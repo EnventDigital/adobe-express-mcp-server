@@ -84,6 +84,38 @@ const MCPResultItemSchema = z.object({
   dataSource: z.enum(['express_sdk', 'spectrum_web_components', 'code_sample', 'unknown'])
 });
 
+const MCPResultItemJsonSchema = {
+  type: "object",
+  properties: {
+    type: { type: "string" },
+    title: { type: "string" },
+    content: { type: "string" },
+    raw_markdown_content: { type: "string" },
+    source_hint: { type: "string" },
+    tags: { type: "array", items: { type: "string" } },
+    language: { type: "string" },
+    frontmatter: { type: "object", additionalProperties: true },
+    parent_title: { type: "string" },
+    dataSource: { type: "string", enum: ['express_sdk', 'spectrum_web_components', 'code_sample', 'unknown'] }
+  },
+  required: ["type", "title", "content", "source_hint", "dataSource"]
+};
+
+// Make sure MCPResultItemJsonSchema is defined before this one.
+const QueryDocumentationOutputJsonSchema = {
+  type: "object",
+  properties: {
+    query_received: { type: "string" },
+    results: {
+      type: "array",
+      items: MCPResultItemJsonSchema // Embed the schema directly
+    },
+    confidence_score: { type: "number" },
+    mode_used: { type: "string", enum: ["github", "local"] }
+  },
+  required: ["query_received", "results"] // confidence_score and mode_used are optional
+};
+
 // --- TypeScript Interfaces ---
 interface QueryDocumentationOutput {
   query_received: string;
@@ -186,9 +218,13 @@ server.tool(
 
 // Create an output schema for setKnowledgeSource
 const SetKnowledgeSourceOutputSchema = {
-  status: { type: "string" },
-  message: { type: "string" },
-  new_mode: { type: "string", enum: ["github", "local"] }
+  type: "object",
+  properties: {
+    status: { type: "string" },
+    message: { type: "string" },
+    new_mode: { type: "string", enum: ["github", "local"] }
+  },
+  required: ["status", "message", "new_mode"]
 };
 
 server.tool(
@@ -231,7 +267,7 @@ server.tool(
   "queryDocumentation",
   "Query the Adobe Express SDK and Spectrum Web Components documentation.",
   QueryDocumentationInputSchema.shape, // Use Zod shape for input schema
-  QueryDocumentationOutputZodSchema.shape, // Use Zod shape for output schema
+  QueryDocumentationOutputJsonSchema, // Use Zod shape for output schema
   async (validatedPayload) => {
     const query_text = validatedPayload.query_text;
     const target_source_hint = validatedPayload.target_source;
@@ -427,9 +463,13 @@ const ImplementFeatureInputSchema = z.object({
 // Register Adobe Express Add-on Developer Tools
 // Create an output schema for scaffold-addon-project
 const ScaffoldAddonOutputSchema = {
-  projectType: { type: "string" },
-  projectName: { type: "string" },
-  description: { type: "string" }
+  type: "object",
+  properties: {
+    projectType: { type: "string" },
+    projectName: { type: "string" },
+    description: { type: "string" }
+  },
+  required: ["projectType", "projectName", "description"]
 };
 
 server.tool(
