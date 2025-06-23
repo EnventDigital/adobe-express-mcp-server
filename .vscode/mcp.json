@@ -1,9 +1,29 @@
 {
+  // Inputs are prompted on first server start, then stored securely by VS Code
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "github-pat",
+      "description": "GitHub Personal Access Token for accessing Adobe Express samples repository",
+      "password": true
+    },
+    {
+      "type": "pickString",
+      "id": "knowledge-source-mode",
+      "description": "Knowledge source mode for documentation",
+      "options": ["github", "local"],
+      "default": "github"
+    }
+  ],
   "servers": {
-    "adobe-express-mcp": {
+    "adobeExpressDev": {
       "type": "stdio",
       "command": "node",
-      "args": ["./dist/index.js"]
+      "args": ["${workspaceFolder}/dist/src/index.js"],
+      "env": {
+        "MCP_GITHUB_PAT": "${input:github-pat}",
+        "KNOWLEDGE_SOURCE_MODE": "${input:knowledge-source-mode}"
+      }
     }
   }
 }

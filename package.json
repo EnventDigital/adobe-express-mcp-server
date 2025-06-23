@@ -1,14 +1,28 @@
 {
   "name": "adobe-express-mcp-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Adobe Express MCP server for integrating with LLMs",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
+  "bin": {
+    "express-mcp-install": "scripts/install-in-vscode.js",
+    "express-mcp-workspace": "scripts/install-to-workspace.js",
+    "express-mcp-help": "scripts/help.js"
+  },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "tsc -w & node --watch dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node dist/src/index.js",
+    "dev": "tsc -w & node --watch dist/src/index.js",
+    "test": "echo \"No tests specified yet\" && exit 0",
+    "test-server": "node dist/scripts/test-mcp-server.js",
+    "validate-schemas": "node scripts/validate-schemas.js",
+    "schema-example": "node scripts/schema-format-example.js",
+    "parse-docs": "node dist/scripts/parse_docs.js",
+    "install-in-vscode": "node scripts/install-in-vscode.js",
+    "install-to-workspace": "node scripts/install-to-workspace.js",
+    "help": "node scripts/help.js",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "mcp",
@@ -16,14 +30,33 @@
     "express",
     "llm"
   ],
-  "author": "",
+  "author": "Geoffrey Nwachukwu <geoff@edgidesign.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sandgrouse/adobe-express-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sandgrouse/adobe-express-mcp-server/issues"
+  },
+  "homepage": "https://github.com/Sandgrouse/adobe-express-mcp-server#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/fs-extra": "^11.0.4",
+    "@types/marked": "^6.0.0",
     "@types/node": "^22.15.18",
     "typescript": "^5.8.3"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.4",
+    "@octokit/rest": "^20.0.2",
+    "dotenv": "^16.4.5",
+    "fs-extra": "^11.2.0",
+    "gray-matter": "^4.0.3",
+    "marked": "^12.0.2",
     "zod": "^3.24.4"
   }
 }
