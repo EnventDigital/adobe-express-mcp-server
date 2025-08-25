@@ -190,12 +190,14 @@ const AssistantCapabilitiesOutputJsonSchema = {
 };
 
 console.error("Attempting to register getAssistantCapabilities. Output schema being used:");
-console.error("AssistantCapabilitiesOutputZodSchema.shape:", JSON.stringify(AssistantCapabilitiesOutputZodSchema.shape, null, 2));
-server.tool(
+console.error("AssistantCapabilitiesOutputZodSchema:", JSON.stringify(AssistantCapabilitiesOutputZodSchema, null, 2));
+server.registerTool(
   "getAssistantCapabilities",
-  "Get the current capabilities, status, and configuration of the Adobe Express & Spectrum Assistant.",
-  {}, // Empty object for params
-  AssistantCapabilitiesOutputZodSchema.shape, // Use wrapped JSON schema for output
+  {
+    description: "Get the current capabilities, status, and configuration of the Adobe Express & Spectrum Assistant.",
+    inputSchema: z.object({}).shape, // Use .shape for empty input
+    outputSchema: AssistantCapabilitiesOutputZodSchema.shape, // Use .shape for output
+  },
   async (_args, _extra) => {
     const allTags = new Set<string>();
     if (currentKnowledgeMode === 'local' && LOCAL_KNOWLEDGE_BASE.length > 0) {
@@ -211,7 +213,7 @@ server.tool(
       allTags.add("sp-button");
     }
     
-    const capabilities: AssistantCapabilitiesOutput = {
+    const structuredContentObject = {
       agent_name: serverInfo.name,
       description: serverInfo.description || "Adobe SDK Assistant",
       supported_query_keywords: Array.from(allTags).slice(0, 40),
@@ -222,23 +224,15 @@ server.tool(
       available_knowledge_modes: availableKnowledgeModes,
     };
     
-    const structuredContentForReturn = {
-        agent_name: capabilities.agent_name,
-        description: capabilities.description,
-        supported_query_keywords: capabilities.supported_query_keywords,
-        documentation_source: capabilities.documentation_source,
-        current_knowledge_mode: capabilities.current_knowledge_mode,
-        available_knowledge_modes: capabilities.available_knowledge_modes
-    };
-    console.error("getAssistantCapabilities handler - structuredContent being returned:", JSON.stringify(structuredContentForReturn, null, 2));
+    console.error("getAssistantCapabilities handler - structuredContent being returned:", JSON.stringify(structuredContentObject, null, 2));
 
     // Return in MCP-compatible format
     return {
-      structuredContent: structuredContentForReturn,
+      structuredContent: structuredContentObject as Record<string, unknown>,
       content: [
         {
           type: "text",
-          text: `${capabilities.agent_name}: ${capabilities.description}. Using ${capabilities.documentation_source} in '${capabilities.current_knowledge_mode}' mode.`
+          text: `${structuredContentObject.agent_name}: ${structuredContentObject.description}. Using ${structuredContentObject.documentation_source} in '${structuredContentObject.current_knowledge_mode}' mode.`
         }
       ]
     };
@@ -292,13 +286,14 @@ const QueryDocumentationOutputZodSchema = z.object({
 });
 
 console.error("Attempting to register queryDocumentation. Output schema being used:");
-console.error("QueryDocumentationOutputJsonSchema:", JSON.stringify(QueryDocumentationOutputJsonSchema, null, 2));
-// Register the queryDocumentation tool
-server.tool(
+console.error("QueryDocumentationOutputZodSchema:", JSON.stringify(QueryDocumentationOutputZodSchema, null, 2));
+server.registerTool(
   "queryDocumentation",
-  "Query the Adobe Express SDK and Spectrum Web Components documentation.",
-  QueryDocumentationInputSchema.shape, // Use Zod shape for input schema
-  QueryDocumentationOutputJsonSchema, // Use Zod shape for output schema
+  {
+    description: "Query the Adobe Express SDK and Spectrum Web Components documentation.",
+    inputSchema: QueryDocumentationInputSchema.shape, // Use .shape for input
+    outputSchema: QueryDocumentationOutputZodSchema.shape, // Use .shape for output
+  },
   async (validatedPayload) => {
     const query_text = validatedPayload.query_text;
     const target_source_hint = validatedPayload.target_source;
@@ -432,13 +427,15 @@ server.tool(
     console.error("queryDocumentation handler - structuredContent being returned:", JSON.stringify(structuredOutputForLogging, null, 2));
 
     // Return in MCP-compatible format, ensuring the structure matches the output schema exactly
+    const structuredContent = {
+      query_received: query_text,
+      results: results.slice(0, 10),
+      confidence_score: confidence_score || 0.1, // Ensure it's never undefined
+      mode_used: currentKnowledgeMode
+    };
+    
     return {
-      structuredContent: {
-        query_received: query_text,
-        results: results.slice(0, 10),
-        confidence_score: confidence_score || 0.1, // Ensure it's never undefined
-        mode_used: currentKnowledgeMode
-      },
+      structuredContent: structuredContent as Record<string, unknown>,
       content: [
         {
           type: "text",

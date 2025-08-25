@@ -1,5 +1,4 @@
 {
-  // Inputs are prompted on first server start, then stored securely by VS Code
   "inputs": [
     {
       "type": "promptString",
@@ -11,7 +10,10 @@
       "type": "pickString",
       "id": "knowledge-source-mode",
       "description": "Knowledge source mode for documentation",
-      "options": ["github", "local"],
+      "options": [
+        "github",
+        "local"
+      ],
       "default": "github"
     }
   ],
@@ -19,7 +21,9 @@
     "adobeExpressDev": {
       "type": "stdio",
       "command": "node",
-      "args": ["${workspaceFolder}/dist/src/index.js"],
+      "args": [
+        "/Users/geoffreynwachukwu/Documents/Sandgrouse/Products/Adobe Express/adobe-express-mcp-server/dist/src/index.js"
+      ],
       "env": {
         "MCP_GITHUB_PAT": "${input:github-pat}",
         "KNOWLEDGE_SOURCE_MODE": "${input:knowledge-source-mode}"

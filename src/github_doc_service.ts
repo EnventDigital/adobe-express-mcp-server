@@ -147,10 +147,21 @@ function extractTagsFromPath(filePathWithinBase: string, dataSource: 'express_sd
   let tags = parts.slice(0, -1).concat(filename === 'index' ? [] : [filename]);
   
   if (dataSource === 'spectrum_web_components') {
-    if (filename === 'readme' && parts.length > 0 && parts[parts.length-1] !== 'packages') {
-      tags = [parts[parts.length-1]];
+    // For spectrum web components, the structure is packages/component-name/README.md
+    // We want to extract the component name as the primary tag
+    if (filename === 'readme' && parts.length >= 2 && parts[0] === 'packages') {
+      // For packages/tabs/README.md -> extract 'tabs'
+      tags = [parts[1]]; // The component name is the second part
     } else {
-      tags = parts.filter(p => p !== 'packages' && p !== 'stories' && p !== 'src' && p !== 'docs');
+      // For other files, filter out structural directories and extract meaningful parts
+      tags = parts.filter(p => p !== 'packages' && p !== 'stories' && p !== 'src' && p !== 'docs' && p !== 'test');
+      
+      // Add the component name (first part after packages) if not already included
+      if (parts.length >= 2 && parts[0] === 'packages' && !tags.includes(parts[1])) {
+        tags.unshift(parts[1]); // Add component name as first tag
+      }
+      
+      // Add filename if it's meaningful
       if (filename !== 'index' && filename !== 'readme' && !tags.includes(filename)) {
         tags.push(filename);
       }
