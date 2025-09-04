@@ -159,7 +159,7 @@ interface AssistantCapabilitiesOutput {
 
 // Create server instance
 const serverInfo = {
-  name: "adobe-express-developer-assistant",
+  name: "community-express-developer-mcp",
   version: "1.0.0",
   description: "Developer assistant for Adobe Express Add-on and Spectrum Web Components development"
 };

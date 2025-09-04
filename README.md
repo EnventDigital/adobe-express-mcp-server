@@ -1,4 +1,4 @@
-# Adobe Express MCP Server
+# Community MCP Server for Adobe Express Add-on Developers
 
 This is a Model Context Protocol (MCP) server designed for Adobe Express Add-on developers. It provides developer-focused tools to assist with building Adobe Express add-ons and integrating with Adobe Express SDK.
 
@@ -24,7 +24,7 @@ You can install the Adobe Express MCP Server in several ways:
 
 ```bash
 # Install globally
-npm install -g adobe-express-mcp-server
+npm install -g community-express-dev-mcp
 
 # Run the VS Code installation script
 express-mcp-install
@@ -34,8 +34,8 @@ express-mcp-install
 
 ```bash
 # Clone the repository
-git clone https://github.com/Sandgrouse/adobe-express-mcp-server.git
-cd Adobe-Express-MCP-server
+git clone https://github.com/EnventDigital/community-express-dev-mcp.git
+cd community-express-dev-mcp
 
 # Install dependencies
 npm install
@@ -58,7 +58,7 @@ express-mcp-workspace
 
 # If installed from GitHub:
 cd /path/to/your/project
-/path/to/Adobe-Express-MCP-server/scripts/install-to-workspace.js
+/path/to/community-express-dev-mcp/scripts/install-to-workspace.js
 ```
 
 This will create a `.vscode/mcp.json` file in your project that configures the Adobe Express MCP server for that workspace.
@@ -142,7 +142,7 @@ To use this MCP server with Claude for Desktop:
     "adobe-express": {
       "command": "node",
       "args": [
-        "/ABSOLUTE/PATH/TO/Adobe-Express-MCP-server/dist/index.js"
+        "/ABSOLUTE/PATH/TO/community-express-dev-mcp/dist/index.js"
       ]
     }
   }
@@ -152,7 +152,7 @@ To use this MCP server with Claude for Desktop:
 4. Replace `/ABSOLUTE/PATH/TO/` with the actual path to your project.
    For example:
    ```
-   "/Users/username/Documents/Adobe-Express-MCP-server/dist/index.js"
+   "/Users/username/Documents/community-express-dev-mcp/dist/index.js"
    ```
    
 5. Save the file and restart Claude for Desktop
@@ -236,10 +236,10 @@ The Adobe Express MCP Server is available as an npm package that you can install
 
 ```bash
 # Install globally
-npm install -g adobe-express-mcp-server
+npm install -g community-express-dev-mcp
 
 # Or install as a dev dependency in your project
-npm install --save-dev adobe-express-mcp-server
+npm install --save-dev community-express-dev-mcp
 ```
 
 After installation, you can use the following commands:
