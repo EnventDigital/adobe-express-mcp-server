@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/enventdigital-adobe-express-mcp-server-badge.png)](https://mseep.ai/app/enventdigital-adobe-express-mcp-server)
+
 # Adobe Express MCP Server
 
 This is a Model Context Protocol (MCP) server designed for Adobe Express Add-on developers. It provides developer-focused tools to assist with building Adobe Express add-ons and integrating with Adobe Express SDK.
