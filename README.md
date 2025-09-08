@@ -2,6 +2,8 @@
 
 This is a Model Context Protocol (MCP) server designed for Adobe Express Add-on developers. It provides developer-focused tools to assist with building Adobe Express add-ons and integrating with Adobe Express SDK.
 
+[![Verified on MseeP](https://mseep.ai/badge.svg)](https://mseep.ai/app/7bcb9afb-5bbc-46d8-b7a1-b4e029896cc3)
+
 ## Features
 
 The server provides the following tools:
